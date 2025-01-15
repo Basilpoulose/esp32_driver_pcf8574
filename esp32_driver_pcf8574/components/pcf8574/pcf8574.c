@@ -49,7 +49,7 @@ esp_err_t pcf8574_deinit(pcf8574_dev_t *dev)
     return ret;
 }
 
-esp_err_t pcf8574_port_read(pcf8574_dev_t *dev, uint8_t *val)
+esp_err_t gpio_read(pcf8574_dev_t *dev, uint8_t *val)
 {
     esp_err_t ret;
     i2c_cmd_handle_t cmd = i2c_cmd_link_create();
@@ -61,7 +61,9 @@ esp_err_t pcf8574_port_read(pcf8574_dev_t *dev, uint8_t *val)
     i2c_master_write_byte(cmd, (dev->addr << 1) | I2C_MASTER_READ, true);
 
     // Read the value from the port
-    i2c_master_read_byte(cmd, val, I2C_MASTER_ACK);
+    //i2c_master_read_byte(cmd, val, I2C_MASTER_ACK);
+    i2c_master_read_byte(cmd, val, I2C_MASTER_NACK);
+
 
     // Stop communication
     i2c_master_stop(cmd);
@@ -73,7 +75,7 @@ esp_err_t pcf8574_port_read(pcf8574_dev_t *dev, uint8_t *val)
     return ret;
 }
 
-esp_err_t pcf8574_port_write(pcf8574_dev_t *dev, uint8_t val)
+esp_err_t gpio_high(pcf8574_dev_t *dev, uint8_t val)
 {
     esp_err_t ret;
     i2c_cmd_handle_t cmd = i2c_cmd_link_create();
@@ -95,4 +97,30 @@ esp_err_t pcf8574_port_write(pcf8574_dev_t *dev, uint8_t val)
     i2c_cmd_link_delete(cmd);
 
     return ret;
+}
+//pulling pin high
+void pcf8574_pullup(pcf8574_dev_t *dev, uint8_t pin)
+{
+    if (pin > P7) {
+        ESP_LOGE(TAG, "Invalid pin number: %d", pin);
+        return;  // Return early if the pin number is invalid
+    }
+
+    esp_err_t ret = gpio_high(dev, pin);  // Set the specified pin high
+    
+    // Check if the write was successful
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to pull up pin %d", pin);
+    }
+}
+
+// for pulling the pin down
+void pcf8574_pulldown(pcf8574_dev_t *dev)
+{
+    esp_err_t ret = gpio_high(dev, 0x00);  // Set all pins low
+    
+    // You can log an error if the write fails (optional)
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to pull down pins");
+    }
 }

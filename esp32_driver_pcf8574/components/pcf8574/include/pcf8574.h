@@ -9,6 +9,16 @@
 extern "C" {
 #endif
 
+// defining pins 
+#define P0 0x01
+#define P1 0x02
+#define P2 0x04
+#define P3 0x08
+#define P4 0x10
+#define P5 0x20
+#define P6 0x40
+#define P7 0x80
+
 typedef struct {
     i2c_port_t port;  /*!< I2C port number */
     uint8_t addr;     /*!< I2C address of the device */
@@ -40,7 +50,7 @@ esp_err_t pcf8574_deinit(pcf8574_dev_t *dev);
 //   val Pointer to store the GPIO port value
 //   ESP_OK on success, or an error code
  
-esp_err_t pcf8574_port_read(pcf8574_dev_t *dev, uint8_t *val);
+esp_err_t gpio_read(pcf8574_dev_t *dev, uint8_t *val);
 
 
 //   Write value to the GPIO port of the PCF8574
@@ -48,7 +58,12 @@ esp_err_t pcf8574_port_read(pcf8574_dev_t *dev, uint8_t *val);
 //   GPIO port value to write
 //   ESP_OK on success, or an error code
  
-esp_err_t pcf8574_port_write(pcf8574_dev_t *dev, uint8_t val);
+esp_err_t gpio_high(pcf8574_dev_t *dev, uint8_t val);
+
+//Pulling specific pin up
+void pcf8574_pullup(pcf8574_dev_t *dev, uint8_t pin);
+//pulling all the pins down 
+void pcf8574_pulldown(pcf8574_dev_t *dev);
 
 #ifdef __cplusplus
 }
